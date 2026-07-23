@@ -6,23 +6,6 @@ The platform combines **Field Survey Ledger** aesthetics in Light Mode with a **
 
 ---
 
-## 🛡️ Animated Cybersecurity Background Tools
-
-AegisIQ features a dedicated, animated **Cybersecurity HUD Background (`CyberBackground`)** active across the **Landing Page, Dashboard Console, Analytics Matrix, and Authentication screens**:
-
-1. 📡 **360° Threat Radar Sweep Scanner:** Live rotating radar beam (`@keyframes radar-spin`) with pinging threat markers (`CAD_DISPATCH`, `CCTV_ANOMALY`).
-2. 🕸️ **Network Topology Node Mesh:** Interconnected SVG network nodes (`192.168.1.4 // CAD`, `0x8F92 // ANOMALY`) with animated signal pulse lines.
-3. 🔐 **Floating Cybersecurity Tool Badges:**
-   - 🛡️ `ZERO_TRUST_FIREWALL // ACTIVE`
-   - ⚡ `GROQ_LLM_L3 // INFERRING`
-   - 🌐 `NEO4J_GRAPH // LINKED`
-   - 🎯 `ANOMALY_DETECTOR // 99.4% ACCURACY`
-   - 🔒 `AES_256_EVIDENCE_VAULT // SECURE`
-4. 📜 **Hexadecimal Security Data Stream Ticker:** Real-time encryption and zero-trust policy tickers.
-5. 🌓 **Light & Dark Mode Support:** Dynamically shifts opacity and color tokens to ensure all cards, maps, and tables remain 100% readable.
-
----
-
 ## 🎛️ 12 Integrated Solution Modules
 
 1. **Interactive Crime Heatmap (`/hotspots` & `/map`):** MapLibre GL vector tiles with interactive spatial pins across Indian states.
