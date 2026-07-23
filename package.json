@@ -1,0 +1,13 @@
+{
+  "name": "aegisiq",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AegisIQ - AI-Powered Public Safety Intelligence & Decision Support Platform for India.",
+  "scripts": {
+    "dev": "pnpm --filter aegisiq-client run dev",
+    "build": "pnpm --filter aegisiq-client run build",
+    "start": "pnpm --filter aegisiq-client run start",
+    "lint": "pnpm --filter aegisiq-client run lint",
+    "typecheck": "pnpm --filter aegisiq-client run typecheck"
+  }
+}

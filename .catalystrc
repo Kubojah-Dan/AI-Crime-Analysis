@@ -1,0 +1,29 @@
+{
+  "defaults": {
+    "project": 1
+  },
+  "actives": {
+    "project": 1,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "50097000000036001",
+      "name": "AegisIQ",
+      "domain": {
+        "id": "50044262682",
+        "name": "aegisiq-60074743903.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60074743903",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "tables": [
+    {
+      "name": "incidents",
+      "columns": [
+        { "name": "id", "type": "VarChar", "max_length": 64, "is_primary": true },
+        { "name": "category", "type": "VarChar", "max_length": 120 },
+        { "name": "subcategory", "type": "VarChar", "max_length": 120 },
+        { "name": "occurred_at", "type": "DateTime" },
+        { "name": "state", "type": "VarChar", "max_length": 120 },
+        { "name": "district", "type": "VarChar", "max_length": 120 },
+        { "name": "location_masked", "type": "VarChar", "max_length": 255 },
+        { "name": "latitude", "type": "Double" },
+        { "name": "longitude", "type": "Double" },
+        { "name": "provenance", "type": "VarChar", "max_length": 32 },
+        { "name": "source_tier", "type": "VarChar", "max_length": 64 }
+      ]
+    },
+    {
+      "name": "hotspots",
+      "columns": [
+        { "name": "id", "type": "VarChar", "max_length": 64, "is_primary": true },
+        { "name": "sector_name", "type": "VarChar", "max_length": 120 },
+        { "name": "risk_score", "type": "Double" },
+        { "name": "incident_count", "type": "Integer" },
+        { "name": "calculated_at", "type": "DateTime" }
+      ]
+    },
+    {
+      "name": "cases",
+      "columns": [
+        { "name": "id", "type": "VarChar", "max_length": 64, "is_primary": true },
+        { "name": "title", "type": "VarChar", "max_length": 255 },
+        { "name": "narrative_summary", "type": "Text" },
+        { "name": "probable_cause", "type": "Text" },
+        { "name": "anomaly_deviation_pct", "type": "Double" },
+        { "name": "status", "type": "VarChar", "max_length": 64 },
+        { "name": "human_reviewer_notes", "type": "Text" }
+      ]
+    },
+    {
+      "name": "audit_log",
+      "columns": [
+        { "name": "id", "type": "VarChar", "max_length": 64, "is_primary": true },
+        { "name": "actor", "type": "VarChar", "max_length": 120 },
+        { "name": "action", "type": "VarChar", "max_length": 120 },
+        { "name": "resource", "type": "VarChar", "max_length": 120 },
+        { "name": "timestamp", "type": "DateTime" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #E7E5DC;
+  --paper-raised: #F1EFE7;
+  --ink: #202A33;
+  --ink-soft: #5B6570;
+  --hairline: #C9C6B8;
+  --cobalt: #2B5AA0;
+  --rust: #A63B2A;
+  --ochre: #C1852B;
+  --stamp-green: #3F6B57;
+  --stamp-gray: #6B6A62;
+}
+
+.dark {
+  --paper: #0B0F17;
+  --paper-raised: #121824;
+  --ink: #E2E8F0;
+  --ink-soft: #94A3B8;
+  --hairline: #1F2937;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hairline borders & Corner registration marks */
+.ledger-panel {
+  background-color: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ledger-corner-cross {
+  position: relative;
+}
+.ledger-corner-cross::before {
+  content: "+";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: var(--hairline);
+  opacity: 0.65;
+  pointer-events: none;
+}
+.ledger-corner-cross::after {
+  content: "+";
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: var(--hairline);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* Provenance stamps */
+.stamp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+}
+
+.stamp-verified {
+  color: #3F6B57;
+  background-color: rgba(63, 107, 87, 0.08);
+}
+
+.stamp-live {
+  color: #2B5AA0;
+  background-color: rgba(43, 90, 160, 0.08);
+}
+
+.stamp-periodic {
+  color: #6B6A62;
+  background-color: rgba(107, 106, 98, 0.08);
+}
+
+.stamp-alert {
+  color: #A63B2A;
+  background-color: rgba(166, 59, 42, 0.08);
+}
+
+/* ── Custom Animations ────────────────────────────────────────── */
+
+@keyframes grid-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(20px, 20px);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-grid-drift {
+  animation: grid-drift 25s linear infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Hover micro-interactions */
+.hover-scale-premium {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-scale-premium:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(32, 42, 51, 0.06);
+  border-color: var(--cobalt);
+}
