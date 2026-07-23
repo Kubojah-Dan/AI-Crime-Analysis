@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['lucide-react'],
   outputFileTracingRoot: path.join(__dirname, '../../'),
+  output: 'standalone',
 };
 
 export default nextConfig;
