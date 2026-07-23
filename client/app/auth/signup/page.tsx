@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, User, Key, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { CyberBackground } from '@/components/ui/cyber-background';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -25,8 +26,9 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-paper text-ink font-sans flex items-center justify-center p-6 selection:bg-cobalt selection:text-white">
-      <div className="w-full max-w-md bg-paper-raised p-8 rounded border border-hairline shadow-md space-y-6">
+    <div className="min-h-screen bg-paper text-ink font-sans flex items-center justify-center p-6 selection:bg-cobalt selection:text-white relative overflow-hidden transition-colors duration-300">
+      <CyberBackground />
+      <div className="w-full max-w-md bg-paper-raised p-8 rounded border border-hairline shadow-md space-y-6 relative z-10">
         
         {/* Header */}
         <div className="text-center space-y-2">

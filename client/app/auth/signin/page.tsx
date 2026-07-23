@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, User, Key, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { CyberBackground } from '@/components/ui/cyber-background';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function SignInPage() {
       });
 
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.access_token) {
         login(data.user.username, data.access_token);
         router.push('/dashboard');
       } else {
@@ -49,8 +50,9 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-paper text-ink font-sans flex items-center justify-center p-6 selection:bg-cobalt selection:text-white">
-      <div className="w-full max-w-md bg-paper-raised p-8 rounded border border-hairline shadow-md space-y-6">
+    <div className="min-h-screen bg-paper text-ink font-sans flex items-center justify-center p-6 selection:bg-cobalt selection:text-white relative overflow-hidden transition-colors duration-300">
+      <CyberBackground />
+      <div className="w-full max-w-md bg-paper-raised p-8 rounded border border-hairline shadow-md space-y-6 relative z-10">
         
         {/* Header */}
         <div className="text-center space-y-2">

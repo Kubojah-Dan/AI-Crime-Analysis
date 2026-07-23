@@ -11,38 +11,24 @@ This document provides instructions to deploy the AegisIQ platform to your Zoho 
 
 ---
 
-## 🚀 Step-by-Step Deployment Instructions
+## 🚀 One-Time Console Enablement
 
-### 1. Install & Login to Catalyst CLI
-If you haven't already, install the Catalyst CLI tools globally via npm and login:
-```bash
-npm install -g zcatalyst-cli
-npx catalyst login
-```
+Before running the CLI deployment command for the first time:
+1. Open your [Zoho Catalyst Console](https://console.catalyst.zoho.com/).
+2. Select project **`AegisIQ`** (`50097000000036001`).
+3. Click on **`Slate`** in the left sidebar menu (under Hosting) to enable the Slate service for your project.
 
 ---
 
-### 2. Verify Your Project Association
-Verify that your local setup is linked to your active Project ID:
-```bash
-cd AegisIQ
+## 🚀 Step-by-Step Deployment Commands
+
+### 1. Link Project (Run inside `AegisIQ`)
+```powershell
+cd C:\Users\USER\Downloads\AI-Crime-Analysis\AegisIQ
 npx catalyst project:use 50097000000036001
 ```
 
----
-
-### 3. Deploy the Next.js Frontend Web Client
-Deploy the web client directly using the `--only client` flag:
-```bash
-npx catalyst deploy --only client
+### 2. Deploy Web App to Catalyst Slate
+```powershell
+npx catalyst deploy slate -m "Deploying AegisIQ Web Client"
 ```
-
----
-
-### 4. Configure Environmental Variables in Zoho Catalyst Console
-Access your [Zoho Catalyst Console](https://console.catalyst.zoho.com/) and declare these settings inside your project configuration:
-- `DATA_GOV_IN_API_KEY`
-- `OPENWEATHER_API_KEY`
-- `GROQ_API_KEY`
-- `REDIS_PASSWORD`
-- `NEO4J_PASSWORD`

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { useTheme } from '@/context/theme-context';
+import { CyberBackground } from '@/components/ui/cyber-background';
 
 export function LedgerShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -206,8 +207,11 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto bg-paper transition-colors duration-300">
-          {children}
+        <main className="flex-1 overflow-y-auto bg-paper transition-colors duration-300 relative overflow-x-hidden">
+          <CyberBackground />
+          <div className="relative z-10">
+            {children}
+          </div>
         </main>
       </div>
 

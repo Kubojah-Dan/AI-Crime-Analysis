@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAegisRealtime } from '@/hooks/use-aegis-realtime';
 import { useTheme } from '@/context/theme-context';
+import { CyberBackground } from '@/components/ui/cyber-background';
 
 export default function LandingPage() {
   const { latestEvent, isConnected } = useAegisRealtime();
@@ -16,17 +17,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-paper text-ink font-sans flex flex-col selection:bg-cobalt selection:text-white relative overflow-hidden transition-colors duration-300">
       
-      {/* Background Decorative Mesh & Grids (Animated Drift) */}
-      <div className="absolute inset-0 opacity-[0.18] pointer-events-none z-0">
-        <svg className="w-full h-full scale-110 animate-grid-drift" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <defs>
-            <pattern id="fine-grid" width="4" height="4" patternUnits="userSpaceOnUse">
-              <path d="M 4 0 L 0 0 0 4" fill="none" stroke="#202A33" strokeWidth="0.1" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#fine-grid)" />
-        </svg>
-      </div>
+      {/* Animated Cybersecurity HUD Background */}
+      <CyberBackground />
 
       {/* ── Header ───────────────────────────────────────────────────── */}
       <header className="h-16 px-6 md:px-12 border-b border-hairline bg-paper-raised/95 backdrop-blur flex items-center justify-between z-30 shadow-sm transition-all duration-300">
