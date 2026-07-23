@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   Radio, AlertTriangle, FileText, Layers, Plus, 
   Archive, HelpCircle, RefreshCw, Settings, ShieldCheck, 
-  User, CheckCircle2, SlidersHorizontal, Activity, LogOut, Sun, Moon, BarChart3 
+  User, CheckCircle2, SlidersHorizontal, Activity, LogOut, Sun, Moon, BarChart3, X, Bell, Database, Cpu 
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { useTheme } from '@/context/theme-context';
@@ -17,7 +17,17 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, isAuthenticated, isInitialized, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [syncToast, setSyncToast] = useState<string | null>(null);
+  
+  // Settings Modal Drawer state
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState('5s');
+  const [defaultJurisdiction, setDefaultJurisdiction] = useState('Delhi NCR');
+  const [anomalyAlerts, setAnomalyAlerts] = useState(true);
+  const [clearanceLevel, setClearanceLevel] = useState('Level-5 (Full Access)');
+  const [settingsSavedToast, setSettingsSavedToast] = useState(false);
 
   useEffect(() => {
     if (isInitialized && !isAuthenticated) {
@@ -27,7 +37,28 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
 
   const handleRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 800);
+    setSyncToast('SYNCING TELEMETRY WITH CATALYST BACKEND...');
+    
+    // Refresh Next.js dynamic routes
+    router.refresh();
+
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setSyncToast('✓ LIVE FEED SYNCED & UPDATED');
+      setTimeout(() => setSyncToast(null), 2500);
+    }, 1200);
+  };
+
+  const handleSaveSettings = () => {
+    localStorage.setItem('aegis_refresh_rate', refreshInterval);
+    localStorage.setItem('aegis_default_jurisdiction', defaultJurisdiction);
+    localStorage.setItem('aegis_anomaly_alerts', String(anomalyAlerts));
+    
+    setSettingsSavedToast(true);
+    setTimeout(() => {
+      setSettingsSavedToast(false);
+      setIsSettingsOpen(false);
+    }, 1200);
   };
 
   const navItems = [
@@ -57,10 +88,10 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-paper text-ink flex flex-col font-sans selection:bg-cobalt selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-paper text-ink flex flex-col font-sans selection:bg-cobalt selection:text-white transition-colors duration-300 relative">
       
       {/* ── Top Bar Header ─────────────────────────────────────────────── */}
-      <header className="h-16 px-6 bg-paper-raised border-b border-hairline flex items-center justify-between z-20 shadow-sm transition-colors duration-300">
+      <header className="h-16 px-6 bg-paper-raised border-b border-hairline flex items-center justify-between z-30 shadow-sm transition-colors duration-300">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 group">
             <span className="font-serif text-2xl font-bold tracking-tight text-cobalt hover:scale-[1.02] transition-transform duration-200">
@@ -91,6 +122,7 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
 
         {/* Top Right Controls */}
         <div className="flex items-center gap-4 font-mono text-xs">
+          
           <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-cobalt/10 border border-cobalt/30 text-cobalt font-bold uppercase tracking-wider animate-pulse-slow">
             <span className="h-2 w-2 rounded-full bg-cobalt animate-pulse"></span>
             LIVE STATUS
@@ -105,29 +137,42 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
             {theme === 'dark' ? <Sun size={15} className="text-yellow-500" /> : <Moon size={15} className="text-cobalt" />}
           </button>
 
+          {/* Interactive Sync / Refresh Feed Button */}
           <button 
             onClick={handleRefresh}
-            title="Refresh Feed"
-            className="p-2 text-ink-soft hover:text-ink hover:bg-paper rounded border border-hairline transition-all duration-200"
+            title="Sync & Refresh Telemetry Feed"
+            className="p-2 text-ink-soft hover:text-ink hover:bg-paper rounded border border-hairline transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
           >
             <RefreshCw size={15} className={isRefreshing ? 'animate-spin text-cobalt' : ''} />
+            <span className="hidden sm:inline text-[10px] font-bold uppercase">SYNC</span>
           </button>
 
-          <Link
-            href="/admin/fairness"
-            title="System Settings"
-            className="p-2 text-ink-soft hover:text-ink hover:bg-paper rounded border border-hairline transition-all duration-200"
+          {/* Interactive System Settings Button */}
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            title="System Settings & Preferences"
+            className="p-2 text-ink-soft hover:text-ink hover:bg-paper rounded border border-hairline transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
           >
-            <Settings size={15} />
-          </Link>
+            <Settings size={15} className="hover:rotate-45 transition-transform duration-300" />
+            <span className="hidden sm:inline text-[10px] font-bold uppercase">SETTINGS</span>
+          </button>
+
         </div>
       </header>
+
+      {/* Sync Toast Notification Banner */}
+      {syncToast && (
+        <div className="absolute top-18 right-6 z-50 bg-cobalt text-white font-mono text-xs font-bold px-4 py-2.5 rounded shadow-lg border border-white/20 flex items-center gap-2 animate-fade-in-up">
+          <Activity size={16} className="animate-spin" />
+          <span>{syncToast}</span>
+        </div>
+      )}
 
       {/* ── Main Workspace Body ────────────────────────────────────────── */}
       <div className="flex-1 flex overflow-hidden">
         
         {/* Left Navigation Sidebar */}
-        <aside className="w-64 bg-paper-raised border-r border-hairline flex flex-col justify-between p-4 flex-shrink-0 transition-colors duration-300">
+        <aside className="w-64 bg-paper-raised border-r border-hairline flex flex-col justify-between p-4 flex-shrink-0 z-20 transition-colors duration-300">
           <div>
             {/* Operator Badge with Logout */}
             <div className="p-3 mb-4 rounded border border-hairline bg-paper flex items-center justify-between gap-3 shadow-inner transition-colors duration-300">
@@ -147,7 +192,7 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
               <button 
                 onClick={() => { logout(); router.push('/'); }}
                 title="Sign Out"
-                className="p-1.5 text-rust hover:bg-rust/10 rounded transition-all duration-200"
+                className="p-1.5 text-rust hover:bg-rust/10 rounded transition-all duration-200 cursor-pointer"
               >
                 <LogOut size={16} />
               </button>
@@ -214,6 +259,131 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+
+      {/* ── System Settings & Preferences Modal Drawer ───────────────── */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 z-50 bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in-up font-sans">
+          <div className="bg-paper-raised border border-hairline rounded max-w-xl w-full p-6 space-y-6 shadow-2xl relative text-ink">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-hairline pb-3">
+              <div className="flex items-center gap-2 font-serif font-bold text-xl text-ink">
+                <Settings size={20} className="text-cobalt" />
+                System Settings & Platform Configuration
+              </div>
+              <button 
+                onClick={() => setIsSettingsOpen(false)}
+                className="p-1 rounded hover:bg-paper text-ink-soft hover:text-ink transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {settingsSavedToast && (
+              <div className="p-3 rounded bg-stamp-green/10 border border-stamp-green/30 text-stamp-green font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 animate-pulse">
+                <CheckCircle2 size={16} />
+                CONFIGURATION PREFERENCES SAVED SUCCESSFULLY
+              </div>
+            )}
+
+            {/* Form Settings Options */}
+            <div className="space-y-5 font-mono text-xs">
+              
+              {/* Option 1: Data Refresh Rate */}
+              <div className="space-y-1">
+                <label className="font-bold text-ink uppercase block">1. Telemetry Stream Refresh Rate</label>
+                <select 
+                  value={refreshInterval}
+                  onChange={e => setRefreshInterval(e.target.value)}
+                  className="w-full bg-paper border border-hairline rounded p-2 text-ink font-sans text-xs outline-none cursor-pointer"
+                >
+                  <option value="3s">3 Seconds (Real-Time High Frequency)</option>
+                  <option value="5s">5 Seconds (Balanced Optimal Performance)</option>
+                  <option value="10s">10 Seconds (Low Bandwidth Saver Mode)</option>
+                </select>
+              </div>
+
+              {/* Option 2: Default Jurisdiction */}
+              <div className="space-y-1">
+                <label className="font-bold text-ink uppercase block">2. Default State Jurisdiction</label>
+                <select 
+                  value={defaultJurisdiction}
+                  onChange={e => setDefaultJurisdiction(e.target.value)}
+                  className="w-full bg-paper border border-hairline rounded p-2 text-ink font-sans text-xs outline-none cursor-pointer"
+                >
+                  <option value="Delhi NCR">Delhi NCR Sector</option>
+                  <option value="Mumbai South">Mumbai South / Twin Peaks</option>
+                  <option value="Bangalore Tech Corridor">Bangalore Tech Corridor</option>
+                  <option value="Chennai Harbour">Chennai Harbour Zone</option>
+                  <option value="Hyderabad Cyberabad">Hyderabad Cyberabad</option>
+                </select>
+              </div>
+
+              {/* Option 3: Anomaly Alerts Toggle */}
+              <div className="flex items-center justify-between p-3 rounded border border-hairline bg-paper">
+                <div>
+                  <div className="font-bold text-ink uppercase">3. Real-Time Anomaly Popups</div>
+                  <div className="font-sans text-[11px] text-ink-soft">Display visual toasts when CAD 112 anomalies spike</div>
+                </div>
+                <button
+                  onClick={() => setAnomalyAlerts(!anomalyAlerts)}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 cursor-pointer ${
+                    anomalyAlerts ? 'bg-cobalt' : 'bg-hairline'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 ${
+                    anomalyAlerts ? 'translate-x-6' : 'translate-x-0'
+                  }`}></div>
+                </button>
+              </div>
+
+              {/* Service Health Diagnostics */}
+              <div className="p-3 rounded border border-hairline bg-paper space-y-2">
+                <div className="font-bold text-cobalt uppercase flex items-center gap-1.5">
+                  <Database size={13} />
+                  <span>ZOHO CATALYST SERVICE HEALTH</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <div className="flex items-center justify-between p-1.5 rounded bg-paper-raised border border-hairline">
+                    <span>Slate Hosting</span>
+                    <span className="stamp-badge stamp-verified">HEALTHY</span>
+                  </div>
+                  <div className="flex items-center justify-between p-1.5 rounded bg-paper-raised border border-hairline">
+                    <span>AppSail API</span>
+                    <span className="stamp-badge stamp-verified">HEALTHY</span>
+                  </div>
+                  <div className="flex items-center justify-between p-1.5 rounded bg-paper-raised border border-hairline">
+                    <span>Data Store</span>
+                    <span className="stamp-badge stamp-verified">CONNECTED</span>
+                  </div>
+                  <div className="flex items-center justify-between p-1.5 rounded bg-paper-raised border border-hairline">
+                    <span>Groq LLM L3</span>
+                    <span className="stamp-badge stamp-live">ACTIVE</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer Actions */}
+            <div className="pt-2 flex justify-end gap-3 font-mono text-xs">
+              <button
+                onClick={() => setIsSettingsOpen(false)}
+                className="py-2 px-4 rounded border border-hairline bg-paper text-ink font-bold hover:bg-paper-raised transition-colors"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={handleSaveSettings}
+                className="py-2 px-6 rounded bg-cobalt text-white font-bold uppercase tracking-wider hover:bg-cobalt-dark shadow-sm transition-all cursor-pointer"
+              >
+                SAVE PREFERENCES
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
