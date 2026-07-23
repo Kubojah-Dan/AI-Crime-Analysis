@@ -9,6 +9,7 @@ import {
 import { useAegisRealtime } from '@/hooks/use-aegis-realtime';
 import { useTheme } from '@/context/theme-context';
 import { CyberBackground } from '@/components/ui/cyber-background';
+import { IndiaMapVector } from '@/components/ui/india-map-vector';
 
 export default function LandingPage() {
   const { latestEvent, isConnected } = useAegisRealtime();
@@ -58,56 +59,71 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ── Hero Section ──────────────────────────────────────────────── */}
-      <section className="px-6 md:px-12 py-20 md:py-28 relative z-10 flex-1 flex flex-col justify-center max-w-5xl mx-auto space-y-8 animate-fade-in-up">
+      {/* ── Hero Section with White-Bordered India Vector Map ─────────── */}
+      <section className="px-6 md:px-12 py-16 md:py-24 relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full animate-fade-in-up">
         
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cobalt/10 border border-cobalt/25 text-cobalt font-mono text-[10px] font-bold uppercase tracking-wider w-fit hover:bg-cobalt/15 transition-colors duration-300">
-          <ShieldCheck size={13} className="text-cobalt" />
-          EXPLAINABLE AI PUBLIC SAFETY DECISION SUPPORT PLATFORM
-        </div>
-
-        <h1 className="font-serif text-4xl md:text-6xl font-bold tracking-tight text-ink leading-tight">
-          Explainable Public Safety Intelligence & <span className="text-cobalt">Decision Support</span>
-        </h1>
-
-        <p className="font-sans text-base md:text-lg text-ink-soft max-w-3xl leading-relaxed">
-          AegisIQ integrates fragmented public safety data across Indian municipal limits, predicts spatial anomalies using transparent risk modeling, and guides resource allocation with strict human review checks.
-        </p>
-
-        {/* CTA Actions */}
-        <div className="flex flex-wrap items-center gap-4 pt-2">
-          <Link
-            href="/auth/signin"
-            className="py-3.5 px-8 rounded bg-cobalt text-white font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-3 hover:bg-cobalt-dark hover:shadow-lg transition-all active:scale-[0.98] duration-300"
-          >
-            ACCESS COMMAND CENTER
-            <ArrowRight size={16} />
-          </Link>
-
-          <Link
-            href="/auth/signup"
-            className="py-3.5 px-6 rounded border border-hairline bg-paper-raised text-ink font-mono text-xs font-bold uppercase tracking-wider hover:bg-paper hover:border-cobalt transition-all duration-300"
-          >
-            REQUEST SECURITY CLEARANCE
-          </Link>
-        </div>
-
-        {/* Live Stream Ticker Card */}
-        {latestEvent && (
-          <div className="ledger-panel rounded p-4 border border-hairline bg-paper-raised/95 backdrop-blur flex flex-wrap items-center justify-between font-mono text-xs shadow-sm gap-4 transition-all duration-500 hover:border-cobalt/50 animate-fade-in-up">
-            <div className="flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-rust animate-ping"></span>
-              <span className="font-bold text-cobalt">{latestEvent.event_id}</span>
-              <span className="text-ink-soft">|</span>
-              <span className="text-ink font-bold">{latestEvent.sector}</span>
-              <span className="text-ink-soft">({latestEvent.category})</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-10">
+          
+          {/* Left Column: Text & Hero CTAs */}
+          <div className="lg:col-span-7 space-y-7">
+            
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cobalt/10 border border-cobalt/25 text-cobalt font-mono text-[10px] font-bold uppercase tracking-wider w-fit hover:bg-cobalt/15 transition-colors duration-300">
+              <ShieldCheck size={13} className="text-cobalt" />
+              EXPLAINABLE AI PUBLIC SAFETY DECISION SUPPORT PLATFORM
             </div>
-            <div className="flex items-center gap-3 ml-auto sm:ml-0">
-              <span className="stamp-badge stamp-alert font-bold">{latestEvent.risk_score}% RISK</span>
-              <span className="text-ink-soft text-[10px]">{latestEvent.timestamp}</span>
+
+            <h1 className="font-serif text-4xl md:text-6xl font-bold tracking-tight text-ink leading-tight">
+              Explainable Public Safety Intelligence & <span className="text-cobalt">Decision Support</span>
+            </h1>
+
+            <p className="font-sans text-base md:text-lg text-ink-soft max-w-2xl leading-relaxed">
+              AegisIQ integrates fragmented public safety data across Indian municipal limits, predicts spatial anomalies using transparent risk modeling, and guides resource allocation with strict human review checks.
+            </p>
+
+            {/* CTA Actions */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <Link
+                href="/auth/signin"
+                className="py-3.5 px-8 rounded bg-cobalt text-white font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-3 hover:bg-cobalt-dark hover:shadow-lg transition-all active:scale-[0.98] duration-300"
+              >
+                ACCESS COMMAND CENTER
+                <ArrowRight size={16} />
+              </Link>
+
+              <Link
+                href="/auth/signup"
+                className="py-3.5 px-6 rounded border border-hairline bg-paper-raised text-ink font-mono text-xs font-bold uppercase tracking-wider hover:bg-paper hover:border-cobalt transition-all duration-300"
+              >
+                REQUEST SECURITY CLEARANCE
+              </Link>
             </div>
+
+            {/* Live Stream Ticker Card */}
+            {latestEvent && (
+              <div className="ledger-panel rounded p-4 border border-hairline bg-paper-raised/95 backdrop-blur flex flex-wrap items-center justify-between font-mono text-xs shadow-sm gap-4 transition-all duration-500 hover:border-cobalt/50 animate-fade-in-up">
+                <div className="flex items-center gap-3">
+                  <span className="h-2 w-2 rounded-full bg-rust animate-ping"></span>
+                  <span className="font-bold text-cobalt">{latestEvent.event_id}</span>
+                  <span className="text-ink-soft">|</span>
+                  <span className="text-ink font-bold">{latestEvent.sector}</span>
+                  <span className="text-ink-soft">({latestEvent.category})</span>
+                </div>
+                <div className="flex items-center gap-3 ml-auto sm:ml-0">
+                  <span className="stamp-badge stamp-alert font-bold">{latestEvent.risk_score}% RISK</span>
+                  <span className="text-ink-soft text-[10px]">{latestEvent.timestamp}</span>
+                </div>
+              </div>
+            )}
+
           </div>
-        )}
+
+          {/* Right Column: India Vector Map with White Borders */}
+          <div className="lg:col-span-5 flex items-center justify-center">
+            <IndiaMapVector />
+          </div>
+
+        </div>
+
       </section>
 
       {/* ── Continuous Decision Loop Section ──────────────────────────── */}
