@@ -45,7 +45,7 @@
         { "name": "actor", "type": "VarChar", "max_length": 120 },
         { "name": "action", "type": "VarChar", "max_length": 120 },
         { "name": "resource", "type": "VarChar", "max_length": 120 },
-        { "name": "timestamp", "type": "DateTime" }
+        { "name": "event_time", "type": "DateTime" }
       ]
     }
   ]
