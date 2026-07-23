@@ -7,6 +7,8 @@ import {
   CheckCircle2, AlertTriangle, ArrowDown, ArrowUp 
 } from 'lucide-react';
 
+import { downloadCSV, downloadPDF, ReportItem } from '@/lib/export-utils';
+
 export default function ReportsPage() {
   const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
 
@@ -14,33 +16,28 @@ export default function ReportsPage() {
     setDownloadSuccess('STRATUS_PDF_EXPORTED');
     setTimeout(() => setDownloadSuccess(null), 2500);
 
-    const reportContent = `# AEGISIQ EXECUTIVE PERFORMANCE BRIEF\n\nREF ID: Aegis-2026-Q3-DEL\nDate: 2026-07-21 08:00 UTC\n\n` +
-      `AUTOMATED WEEKLY SYNTHESIS:\n` +
-      `Analysis of the preceding 168-hour window indicates a 4.2% stabilization in Grade-A incidents across the North-East corridor.\n` +
-      `CORE DIRECTIVE: Re-allocate tactical assets from Sector 3 (Low Activity) to the Waterfront/Dwarka District.\n`;
+    const reportItems: ReportItem[] = [
+      { id: '#AQ-REP-01', timestamp: '2026.07.21 08:00 UTC', category: 'First Response Time', ipc_section: 'IPC 379', district: 'Connaught Place / Central', risk_score: 88, status: 'OPTIMIZED', provenance: 'VERIFIED' },
+      { id: '#AQ-REP-02', timestamp: '2026.07.21 08:00 UTC', category: 'Case Closure Rate', ipc_section: 'IPC 420', district: 'Bangalore Tech Corridor', risk_score: 92, status: 'ELITE', provenance: 'VERIFIED' },
+      { id: '#AQ-REP-03', timestamp: '2026.07.21 08:00 UTC', category: 'Evidence Integrity', ipc_section: 'IPC 354', district: 'Mumbai Marine Drive', risk_score: 74, status: 'REVIEW', provenance: 'PERIODIC' },
+      { id: '#AQ-REP-04', timestamp: '2026.07.21 08:00 UTC', category: 'Personnel Availability', ipc_section: 'IPC 380', district: 'Chennai Harbour Zone', risk_score: 65, status: 'LOW STOCK', provenance: 'PERIODIC' },
+    ];
 
-    const blob = new Blob([reportContent], { type: 'text/markdown' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'AegisIQ-Executive-Brief.md';
-    link.click();
+    downloadPDF('Executive Performance Brief (NCRB Benchmark Matrix)', reportItems);
   };
 
   const handleDownloadCSV = () => {
     setDownloadSuccess('CSV_PERFORMANCE_MATRIX_EXPORTED');
     setTimeout(() => setDownloadSuccess(null), 2500);
 
-    const csvContent = `Metric Category,City Actual,Benchmark,Variance,Status\n` +
-      `First Response Time,04:12 min,04:30 min,-00:18,OPTIMIZED\n` +
-      `Case Closure Rate,92.4%,88.5%,+3.9%,ELITE\n` +
-      `Evidence Integrity,99.1%,99.5%,-0.4%,REVIEW\n` +
-      `Personnel Availability,81.0%,85.0%,-4.0%,LOW STOCK\n`;
+    const matrixRows = [
+      { Metric_Category: 'First Response Time', City_Actual: '04:12 min', Benchmark: '04:30 min', Variance: '-00:18', Status: 'OPTIMIZED' },
+      { Metric_Category: 'Case Closure Rate', City_Actual: '92.4%', Benchmark: '88.5%', Variance: '+3.9%', Status: 'ELITE' },
+      { Metric_Category: 'Evidence Integrity', City_Actual: '99.1%', Benchmark: '99.5%', Variance: '-0.4%', Status: 'REVIEW' },
+      { Metric_Category: 'Personnel Availability', City_Actual: '81.0%', Benchmark: '85.0%', Variance: '-4.0%', Status: 'LOW STOCK' },
+    ];
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'AegisIQ-Performance-Matrix.csv';
-    link.click();
+    downloadCSV('AegisIQ-Performance-Matrix', matrixRows);
   };
 
   return (
