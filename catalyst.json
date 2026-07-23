@@ -1,9 +1,9 @@
 {
   "name": "AegisIQ",
   "project_id": "50097000000036001",
-  "client": [
+  "slate": [
     {
-      "name": "client",
+      "name": "AegisIQ",
       "source": "client"
     }
   ]
