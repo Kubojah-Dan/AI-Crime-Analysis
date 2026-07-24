@@ -1,5 +1,5 @@
 /**
- * AegisIQ Report Export Utilities (PDF & CSV)
+ * AegisIQ Report Export Utilities (Styled Excel & PDF)
  */
 
 export interface ReportItem {
@@ -17,36 +17,93 @@ export function downloadCSV(filename: string, rows: Record<string, any>[]) {
   if (!rows || !rows.length) return;
 
   const dateStr = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-
-  // Build clean CSV with Metadata Header Block
   const headers = Object.keys(rows[0]);
-  const metadataBlock = [
-    `# =========================================================================`,
-    `# AEGISIQ PUBLIC SAFETY INTELLIGENCE & DECISION SUPPORT REPORT`,
-    `# REPORT NAME: ${filename.toUpperCase()}`,
-    `# GENERATED TIMESTAMP: ${dateStr}`,
-    `# SECURITY CLEARANCE: LEVEL-5 / POLICE CONTROL ROOM COPY`,
-    `# PROVENANCE: IMMUTABLE AUDIT CHAIN VERIFIED`,
-    `# =========================================================================`,
-    ``
-  ].join('\n');
 
-  const dataRows = [
-    headers.map(h => `"${h.toUpperCase()}"`).join(','),
-    ...rows.map(row => 
-      headers.map(header => {
-        const val = row[header] ?? '';
-        return `"${String(val).replace(/"/g, '""')}"`;
-      }).join(',')
-    )
-  ].join('\n');
+  // Build Styled HTML Spreadsheet (.xls) compatible with Microsoft Excel & Apple Numbers
+  const excelHtml = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>AegisIQ Intelligence</x:Name>
+                <x:WorksheetOptions>
+                  <x:DisplayGridlines/>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          table { border-collapse: collapse; font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; }
+          .meta-header { background-color: #0F172A; color: #38BDF8; font-weight: bold; font-size: 13px; text-align: left; padding: 12px; border: 1px solid #1E293B; }
+          .meta-sub { background-color: #1E293B; color: #94A3B8; font-size: 11px; padding: 8px 12px; border: 1px solid #334155; }
+          th { background-color: #2B5AA0; color: #FFFFFF; font-weight: bold; text-transform: uppercase; font-size: 11px; padding: 10px 16px; border: 1px solid #1E3A8A; text-align: left; }
+          td { padding: 9px 16px; border: 1px solid #CBD5E1; color: #1E293B; }
+          .risk-high { background-color: #FEE2E2; color: #991B1B; font-weight: bold; }
+          .risk-mod { background-color: #FEF3C7; color: #92400E; font-weight: bold; }
+          .risk-low { background-color: #DCFCE7; color: #166534; font-weight: bold; }
+          .id-col { font-family: monospace; font-weight: bold; color: #2B5AA0; }
+        </style>
+      </head>
+      <body>
+        <table>
+          <thead>
+            <tr>
+              <td colspan="${headers.length}" className="meta-header" style="background-color:#0F172A; color:#38BDF8; font-size:14px; font-weight:bold; padding:12px; border:1px solid #1E293B;">
+                AEGISIQ PUBLIC SAFETY INTELLIGENCE & DECISION SUPPORT REPORT
+              </td>
+            </tr>
+            <tr>
+              <td colspan="${headers.length}" className="meta-sub" style="background-color:#1E293B; color:#94A3B8; font-size:11px; padding:8px 12px; border:1px solid #334155;">
+                REPORT: ${filename.toUpperCase()} | GENERATED: ${dateStr} | CLEARANCE: LEVEL-5 POLICE CONTROL ROOM | PROVENANCE: VERIFIED
+              </td>
+            </tr>
+            <tr><td colspan="${headers.length}" style="height:10px; background-color:#FFFFFF; border:none;"></td></tr>
+            <tr>
+              ${headers.map(h => `<th style="background-color:#2B5AA0; color:#FFFFFF; font-weight:bold; text-transform:uppercase; font-size:11px; padding:10px 16px; border:1px solid #1E3A8A;">${h.replace(/_/g, ' ')}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => {
+              const riskStr = String(row['Risk_Level'] || row['status'] || row['risk_score'] || '').toUpperCase();
+              let rowClass = '';
+              if (riskStr.includes('HIGH') || riskStr.includes('CRITICAL') || Number(riskStr) > 70) rowClass = 'background-color:#FEE2E2; color:#991B1B; font-weight:bold;';
+              else if (riskStr.includes('MOD') || (Number(riskStr) >= 40 && Number(riskStr) <= 70)) rowClass = 'background-color:#FEF3C7; color:#92400E;';
+              else if (riskStr.includes('LOW')) rowClass = 'background-color:#DCFCE7; color:#166534;';
 
-  // Add BOM (\uFEFF) for perfect UTF-8 rendering in Microsoft Excel & Apple Numbers
-  const csvBlob = new Blob(['\uFEFF' + metadataBlock + dataRows], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(csvBlob);
+              return `
+                <tr>
+                  ${headers.map(header => {
+                    const val = row[header] ?? '';
+                    const isRiskCol = header.toLowerCase().includes('risk');
+                    const isIdCol = header.toLowerCase().includes('district') || header.toLowerCase().includes('id');
+                    
+                    let cellStyle = 'padding:9px 16px; border:1px solid #CBD5E1; color:#1E293B;';
+                    if (isRiskCol && rowClass) cellStyle += ' ' + rowClass;
+                    if (isIdCol) cellStyle += ' font-weight:bold; color:#2B5AA0;';
+
+                    return `<td style="${cellStyle}">${val}</td>`;
+                  }).join('')}
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+
+  // Download styled Excel spreadsheet (.xls)
+  const blob = new Blob(['\uFEFF' + excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
+  link.setAttribute('download', `${filename}.xls`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -113,7 +170,8 @@ export function downloadPDF(title: string, items: ReportItem[]) {
             text-align: left;
           }
           th {
-            background-color: #E7E5DC;
+            background-color: #2B5AA0;
+            color: #FFFFFF;
             font-family: 'IBM Plex Mono', monospace;
             font-size: 11px;
             text-transform: uppercase;
