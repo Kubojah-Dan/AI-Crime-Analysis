@@ -2,20 +2,41 @@
 
 import React, { useState, useEffect } from 'react';
 import { LedgerShell } from '@/components/layout/ledger-shell';
-import { Radio, MapPin, RefreshCw, ShieldAlert, Activity, ChevronUp } from 'lucide-react';
+import { Radio, MapPin, RefreshCw, ShieldAlert, Activity, ChevronUp, Navigation } from 'lucide-react';
 import { useAegisRealtime } from '@/hooks/use-aegis-realtime';
 import { MapLibreView } from '@/components/map/maplibre-view';
 
+interface CityInfo {
+  name: string;
+  query: string;
+  lat: number;
+  lng: number;
+  latLabel: string;
+  lngLabel: string;
+  sectorLabel: string;
+}
+
+const INDIAN_CITIES: CityInfo[] = [
+  { name: 'Delhi', query: 'Delhi', lat: 28.6139, lng: 77.2090, latLabel: '28.6139° N', lngLabel: '77.2090° E', sectorLabel: 'DELHI NCR SECTOR' },
+  { name: 'Mumbai', query: 'Mumbai', lat: 18.9440, lng: 72.8230, latLabel: '18.9440° N', lngLabel: '72.8230° E', sectorLabel: 'MUMBAI SOUTH SECTOR' },
+  { name: 'Bangalore', query: 'Bangalore', lat: 12.9750, lng: 77.6080, latLabel: '12.9750° N', lngLabel: '77.6080° E', sectorLabel: 'BANGALORE TECH CORRIDOR' },
+  { name: 'Lucknow', query: 'Lucknow', lat: 26.8467, lng: 80.9462, latLabel: '26.8467° N', lngLabel: '80.9462° E', sectorLabel: 'LUCKNOW CENTRAL SECTOR' },
+  { name: 'Chennai', query: 'Chennai', lat: 13.0827, lng: 80.2707, latLabel: '13.0827° N', lngLabel: '80.2707° E', sectorLabel: 'CHENNAI HARBOUR SECTOR' },
+  { name: 'Hyderabad', query: 'Hyderabad', lat: 17.3850, lng: 78.4867, latLabel: '17.3850° N', lngLabel: '78.4867° E', sectorLabel: 'HYDERABAD CYBERABAD' },
+];
+
 export default function HotspotsPage() {
   const { latestEvent, isConnected } = useAegisRealtime();
+  const [selectedCity, setSelectedCity] = useState<CityInfo>(INDIAN_CITIES[0]);
   const [weatherData, setWeatherData] = useState<{ temp: number; humidity: number; desc: string } | null>(null);
 
+  // Dynamic Weather Fetching per Selected City
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/weather/Delhi')
+    fetch(`http://localhost:8000/api/v1/weather/${selectedCity.query}`)
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
-          const desc = data.condition || data.weather_desc || data.desc || 'Haze & High Humidity';
+          const desc = data.condition || data.weather_desc || data.desc || 'Partly Cloudy';
           const temp = data.temp_c ?? data.temperature ?? data.temp ?? 31.4;
           const humidity = data.humidity_pct ?? data.humidity ?? 68;
           setWeatherData({ temp, humidity, desc });
@@ -24,18 +45,38 @@ export default function HotspotsPage() {
       .catch(() => {
         setWeatherData({ temp: 31.4, humidity: 68, desc: 'Partly Cloudy' });
       });
-  }, []);
+  }, [selectedCity]);
 
   return (
     <LedgerShell>
-      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-paper">
+      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-paper selection:bg-cobalt selection:text-white">
         
-        {/* Operations Center Header Bar */}
+        {/* Operations Center Dynamic Header Bar */}
         <div className="h-12 px-6 bg-paper-raised border-b border-hairline flex items-center justify-between font-mono text-xs text-ink-soft">
           <div className="flex items-center gap-4">
             <h1 className="font-serif text-base font-bold text-ink tracking-tight">Operations Center</h1>
             <span>|</span>
-            <span>LOC // 28.6139° N, 77.2090° E (DELHI NCR SECTOR)</span>
+
+            {/* City / Sector Dynamic Selector */}
+            <div className="flex items-center gap-2">
+              <Navigation size={12} className="text-cobalt" />
+              <select 
+                value={selectedCity.name}
+                onChange={(e) => {
+                  const city = INDIAN_CITIES.find(c => c.name === e.target.value) || INDIAN_CITIES[0];
+                  setSelectedCity(city);
+                }}
+                className="bg-paper border border-hairline rounded px-2.5 py-1 text-xs font-bold text-ink outline-none cursor-pointer hover:border-cobalt transition-colors"
+              >
+                {INDIAN_CITIES.map(c => (
+                  <option key={c.name} value={c.name}>{c.name} Sector</option>
+                ))}
+              </select>
+            </div>
+
+            <span>|</span>
+            <span className="font-bold text-ink">LOC // {selectedCity.latLabel}, {selectedCity.lngLabel} ({selectedCity.sectorLabel})</span>
+            
             {weatherData && (
               <>
                 <span>|</span>
@@ -55,106 +96,54 @@ export default function HotspotsPage() {
         {/* Map & Insight Panel Body */}
         <div className="flex-1 flex overflow-hidden relative">
           
-          {/* Main Map View Container with Real MapLibre Map */}
+          {/* Main Map View Container with Dynamic MapLibre Map Center */}
           <div className="flex-1 relative bg-[#E2DFD5] border-r border-hairline overflow-hidden">
-            <MapLibreView center={[77.2090, 28.6139]} zoom={5} showSectorToolbar={true} />
+            <MapLibreView center={[selectedCity.lng, selectedCity.lat]} zoom={11} showSectorToolbar={true} />
 
             {/* Corner Registration Crosshairs */}
             <div className="absolute top-4 left-4 font-mono text-xs text-hairline pointer-events-none z-10">+</div>
-            <div className="absolute top-4 right-4 font-mono text-xs text-hairline pointer-events-none z-10">+</div>
-            <div className="absolute bottom-4 left-4 font-mono text-xs text-hairline pointer-events-none z-10">+</div>
             <div className="absolute bottom-4 right-4 font-mono text-xs text-hairline pointer-events-none z-10">+</div>
           </div>
 
-          {/* Right AI Insight Panel */}
-          <aside className="w-96 bg-paper-raised p-5 flex flex-col justify-between overflow-y-auto">
-            <div>
-              <div className="flex items-center justify-between border-b border-hairline pb-3 mb-4">
-                <h2 className="font-sans text-xs font-bold uppercase tracking-wider text-ink">AI Insight Panel</h2>
-                <Radio size={16} className="text-cobalt" />
+          {/* Right Operational Insight Sidebar */}
+          <div className="w-80 bg-paper-raised border-l border-hairline p-5 font-mono text-xs flex flex-col justify-between overflow-y-auto">
+            <div className="space-y-4">
+              <div className="border-b border-hairline pb-2 flex items-center justify-between">
+                <span className="font-bold text-ink uppercase">SECTOR TELEMETRY</span>
+                <span className="stamp-badge stamp-live">{selectedCity.name.toUpperCase()}</span>
               </div>
 
-              {/* Dynamic Live Event Card */}
+              <div className="space-y-2">
+                <div className="p-3 rounded border border-hairline bg-paper flex justify-between items-center">
+                  <span className="text-ink-soft">Latitude</span>
+                  <span className="font-bold text-ink">{selectedCity.latLabel}</span>
+                </div>
+                <div className="p-3 rounded border border-hairline bg-paper flex justify-between items-center">
+                  <span className="text-ink-soft">Longitude</span>
+                  <span className="font-bold text-ink">{selectedCity.lngLabel}</span>
+                </div>
+                <div className="p-3 rounded border border-hairline bg-paper flex justify-between items-center">
+                  <span className="text-ink-soft">Sector Code</span>
+                  <span className="font-bold text-cobalt">{selectedCity.query.toUpperCase()}-SEC-01</span>
+                </div>
+              </div>
+
               {latestEvent && (
-                <div className="ledger-panel rounded p-4 border border-cobalt/40 bg-cobalt/5 mb-4 shadow-sm animate-pulse">
-                  <div className="flex items-center justify-between font-mono text-[10px] text-cobalt mb-1 font-bold">
-                    <span>LIVE EVENT STREAM // {latestEvent.event_id}</span>
-                    <span className="stamp-badge stamp-live">REAL-TIME</span>
-                  </div>
-                  <h3 className="font-serif font-bold text-sm text-ink mb-1">{latestEvent.sector}</h3>
-                  <p className="font-sans text-xs text-ink-soft mb-2">{latestEvent.workflow.detect}</p>
-                  <p className="font-mono text-[10px] text-cobalt font-bold leading-normal">{latestEvent.workflow.explain}</p>
-                  <div className="mt-3 pt-2 border-t border-cobalt/20 flex justify-between font-mono text-[10px] text-rust font-bold">
-                    <span>RISK RATING</span>
-                    <span>{latestEvent.risk_score}% CRITICAL</span>
-                  </div>
+                <div className="p-3 rounded border border-cobalt/30 bg-cobalt/5 space-y-1 font-mono text-xs animate-fade-in-up">
+                  <div className="text-[10px] text-cobalt font-bold uppercase">LIVE EVENT INGESTED</div>
+                  <div className="font-bold text-ink">{latestEvent.category}</div>
+                  <div className="text-xs text-ink-soft">{latestEvent.sector}</div>
+                  <div className="text-[10px] text-rust font-bold pt-1">RISK RATING: {latestEvent.risk_score}%</div>
                 </div>
               )}
-
-              {/* Standard Cards */}
-              <div className="space-y-4 font-sans">
-                <div className="ledger-panel rounded p-4 border border-hairline bg-paper shadow-sm">
-                  <div className="flex items-center justify-between font-mono text-[10px] text-ink-soft mb-2">
-                    <span>COORD: 28.61 / 77.20</span>
-                    <span className="stamp-badge stamp-live">LIVE</span>
-                  </div>
-                  <h3 className="font-serif font-bold text-sm text-ink mb-2">Connaught Place / Sector 7</h3>
-                  <p className="text-xs text-ink-soft leading-relaxed mb-4">
-                    Anomaly detected in pedestrian flow patterns. Tier-1 Delhi 112 Dispatch reports 12.4% increase in service calls over baseline.
-                  </p>
-                  <div className="border-t border-hairline pt-3 flex items-center justify-between font-mono text-[10px]">
-                    <div className="w-2/3 bg-hairline/30 h-1.5 rounded overflow-hidden">
-                      <div className="h-full bg-rust" style={{ width: '78%' }}></div>
-                    </div>
-                    <span className="font-bold text-ink">78% RISK</span>
-                  </div>
-                </div>
-
-                <div className="ledger-panel rounded p-4 border border-hairline bg-paper shadow-sm">
-                  <div className="flex items-center justify-between font-mono text-[10px] text-ink-soft mb-2">
-                    <span>COORD: 19.07 / 72.87</span>
-                    <span className="stamp-badge stamp-verified">VERIFIED</span>
-                  </div>
-                  <h3 className="font-serif font-bold text-sm text-ink mb-2">Marine Drive / Twin Peaks</h3>
-                  <p className="text-xs text-ink-soft leading-relaxed mb-4">
-                    Signal stability verified. Intelligence ledger updated with field survey reports from Zulu team. Static status.
-                  </p>
-                  <div className="border-t border-hairline pt-3 flex items-center justify-between font-mono text-[10px]">
-                    <div className="w-2/3 bg-hairline/30 h-1.5 rounded overflow-hidden">
-                      <div className="h-full bg-stamp-green" style={{ width: '12%' }}></div>
-                    </div>
-                    <span className="font-bold text-ink">12% RISK</span>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          </aside>
+
+            <div className="pt-4 border-t border-hairline text-[9px] text-ink-soft italic leading-tight">
+              AegisIQ telemetry engine dynamically updates GPS coordinates and weather conditions upon sector switching.
+            </div>
+          </div>
 
         </div>
-
-        {/* Bottom System Freshness Footer Bar */}
-        <footer className="h-10 px-6 bg-paper-raised border-t border-hairline flex items-center justify-between font-mono text-[11px] text-ink-soft">
-          <div className="flex items-center gap-6">
-            <span className="flex items-center gap-1.5 text-rust font-bold">
-              <span className="h-2 w-2 rounded-full bg-rust"></span>
-              System Freshness: <span className="underline">LIVE_SYNCED</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-stamp-green"></span>
-              Delhi 112 Dispatch <span className="text-ink">1m ago</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-stamp-green"></span>
-              Mumbai Comms <span className="text-ink">3m ago</span>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span>V 2.0.0_PRODUCTION</span>
-            <ChevronUp size={14} />
-          </div>
-        </footer>
 
       </div>
     </LedgerShell>
