@@ -1,36 +1,45 @@
-# AegisIQ: AI-Driven Public Safety Intelligence & Visualization Platform
+# AegisIQ: Operational AI Fusion & Decision Support Platform for India
 
-**AegisIQ** is an explainable AI decision-support platform designed specifically for public safety officers, police control rooms, and emergency response teams in **India** (covering Karnataka, Delhi, Maharashtra, Tamil Nadu, Telangana, and Uttar Pradesh).
+**AegisIQ** is an explainable AI decision-support platform designed specifically for public safety officers, police control rooms, and emergency response teams in **India** (covering Uttar Pradesh, Delhi NCR, Karnataka, Maharashtra, Tamil Nadu, Telangana).
 
-The platform combines **Field Survey Ledger** aesthetics in Light Mode with a **Cybersecurity Command Center** dark theme, complete with high-visibility animated cyber background tools and real-time telemetry streams.
-
----
-
-## 🎛️ 12 Integrated Solution Modules
-
-1. **Interactive Crime Heatmap (`/hotspots` & `/map`):** MapLibre GL vector tiles with interactive spatial pins across Indian states.
-2. **District / Zone Comparison Matrix (`/analytics`):** Side-by-side comparison tool comparing incident counts, closure rates, and trends between states.
-3. **Category & Severity Filters (`/incidents` & `/analytics`):** Filter by IPC sections (**IPC 379 Larceny, IPC 420 Cyber Fraud, IPC 354 Public Safety, IPC 380 Theft**).
-4. **Daily / Weekly / Monthly Trends (`/analytics`):** Time-series controls with trend direction indicators (`+6.2%`, `-1.8%`).
-5. **Hotspot Detection Engine (`/hotspots`):** Density-based concentric contour rings with centroid unit pins (`DL_UNIT_99 // TIER_1`).
-6. **Anomaly & Spike Alerts (`/hotspots` & `/analytics`):** Real-time CCTV metadata feeds (`CAM-DEL-CP-04`) and sensor flow anomaly indicators.
-7. **Similar-Incident Clustering (`/analytics` & `/cases`):** Spatial-temporal clustering engine (`#AQ-CLR-441`) with 96.4% match confidence score.
-8. **AI Insights Panel (`/map` & `/analytics`):** Groq Llama 3 LLM natural language explainable summaries and probable cause inference.
-9. **Case & Incident Drill-down (`/cases/[id]`):** Detailed case workspace with evidence lineage cards, CCTV metadata, and suspect graph links.
-10. **Automated Report Export (`/reports`):** Stratus PDF export & Granular Performance Matrix CSV downloader buttons.
-11. **RBAC & Audit Trail (`/admin/fairness`):** Security Level-5 role-based audit trail logging analyst actions, gate reviews, and system events.
-12. **Fairness & Explainability (`/admin/fairness` & `/cases/[id]`):** **Human Review Gate** (`Flag for Patrol`, `Request Verification`, `Dismiss Anomaly`) and underreporting disclaimers.
+The platform combines a **Cyber Command Center dark shell** for live operations (`/ops`, `/ops/queue`, `/ops/replay/[id]`, `/ops/simulator`, `/map`, `/hotspots`) with **Field Survey Ledger light surfaces** for documentation, offline mobile field entry (`/incidents/new`), case narratives (`/cases/[id]`), and executive reports (`/reports`).
 
 ---
 
-## 🌟 Beyond MVP — 6 Capability Tracks
+## 🚀 Key Operational Features
 
-- **Track 01 Real-Time Streams:** CCTV metadata, sensor feeds & 112 emergency calls.
-- **Track 02 Multi-Modal AI:** Text, image & audio/notes intelligence via Groq Llama 3 LLM.
-- **Track 03 Mobile Companion:** Field entry form at `/incidents/new` for on-the-go officer updates.
-- **Track 04 Network Graph:** Neo4j entity link analysis connecting cases, suspects, and police station limits.
-- **Track 05 Fairness Gate v2:** Automated policy checks, auditability, and analyst review gates.
-- **Track 06 Multi-State SaaS:** Multi-tenant deployment configured by state (Karnataka, Delhi, Maharashtra, Tamil Nadu).
+### 1. 🤖 Explainable Live Ops Copilot (`/ops` & `CopilotCard`)
+Signature operational narrative engine fusing multi-source signals (112 calls, CCTV metadata, sensor anomalies, case history, similar clusters, patrol unit status).
+- Outputs plain-language summaries, predicted risk scores (0.00-1.00), confidence percentage bars, top risk drivers, uncertainty notes, and recommended next actions.
+- **Human Review Gate:** Human-in-the-loop action buttons (`Approve & Dispatch`, `Request Verification`, `Escalate to Supervisor`).
+
+### 2. 🎛️ Primary Command Fusion Console (`/ops`)
+- **Top Bar:** Jurisdiction selector (`Uttar Pradesh`, `Delhi NCR`, `Karnataka`, `Maharashtra`), Shift Status (`Day Shift`), Latency (`182ms`), Ingestion Health (`Healthy`), Global Search (`/search`), and Emergency Mode switch.
+- **Left 60% Canvas:** MapLibre GL tile map, patrol unit pins (`UP-32-PCR-124`), police station markers, incident clusters, risk contour rings, and district risk leaderboard.
+- **Right 40% Operational Stack:** Priority Alert Queue, Explainable Live Ops Copilot, and Live Telemetry stream cards.
+- **Bottom Operational Strip:** Incident Timeline, Patrol Unit Status, Evidence & Audit Trail (`Hash: 9c7f...a2b1`, Chain Verified), and Case Workspace launcher.
+
+### 3. 🚨 Unified Command Triage Queue (`/ops/queue`)
+Multi-channel intake (112 Emergency Calls, CCTV triggers, ALPR hits, Watchlist matches, Community reports) with SLA countdown timers, priority severity badges (`CRITICAL`, `HIGH`, `MEDIUM`), beat locations, and deduplication.
+
+### 4. 🔍 Confidence + Provenance Ledger ("Why am I seeing this?") (`ProvenanceDrawer`)
+Interactive drawer displaying evidence chips, timestamps, source reliability ratings, corroboration counts, contradiction flags, and label classifications (`OBSERVED`, `INFERRED`, `PREDICTED`).
+
+### 5. 🎬 Incident Storyline & Replay Player (`/ops/replay/[id]`)
+Interactive temporal narrative player with playback scrubber (Play, Pause, Reset, Step Slider) animating 112 calls, CCTV detection timestamps, and patrol unit dispatch movement.
+
+### 6. 📊 Patrol Coverage & "What-If" Deployment Simulator (`/ops/simulator`)
+Side-by-side situational planner comparing **Current Deployment State** vs **Proposed Simulated State**, calculating response-time deltas (`-1.8 min`) and coverage gap reduction (`89%`).
+
+### 7. 🌐 Cross-System Entity Resolution & Link Graph (`/search` & `/entities/[id]`)
+- Global Search across case IDs, phone numbers, vehicle plates, suspect aliases, and station limits.
+- Neo4j-backed 1-hop and 2-hop entity relationship graph visualizer with analyst-verified vs machine-suggested link toggles.
+
+### 8. 🛡️ Model Governance & AI Health Console (`/admin/models` & `/admin/data-quality`)
+Traffic-light health cards monitoring model latency (p95 `182ms`), false-alert rate (`4.2%`), analyst override rate (`8.6%`), regional drift (`0.02`), and ingest pipeline status.
+
+### 9. 📱 Field Survey Ledger Mobile Companion (`/incidents/new`)
+Field Survey Ledger light aesthetic for field officers with offline queueing (`LOCAL_QUEUE_READY`), auto GPS location capture (`26.8467, 80.9462`), photo/audio evidence upload, dictated notes, and SHA-256 attachment hashing.
 
 ---
 
