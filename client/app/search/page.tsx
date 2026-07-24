@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { LedgerShell } from '@/components/layout/ledger-shell';
 import { Search, Hash, MapPin, User, Car, FileText, ArrowUpRight, Network } from 'lucide-react';
 
-export default function GlobalSearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams?.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
@@ -81,5 +81,13 @@ export default function GlobalSearchPage() {
 
       </div>
     </LedgerShell>
+  );
+}
+
+export default function GlobalSearchPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center font-mono text-xs text-ink-soft">Loading Search Engine...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }
