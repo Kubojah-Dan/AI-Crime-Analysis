@@ -15,11 +15,14 @@ export default function HotspotsPage() {
       .then(res => res.json())
       .then(data => {
         if (data.status === 'success') {
-          setWeatherData({ temp: data.temperature, humidity: data.humidity, desc: data.weather_desc });
+          const desc = data.condition || data.weather_desc || data.desc || 'Haze & High Humidity';
+          const temp = data.temp_c ?? data.temperature ?? data.temp ?? 31.4;
+          const humidity = data.humidity_pct ?? data.humidity ?? 68;
+          setWeatherData({ temp, humidity, desc });
         }
       })
       .catch(() => {
-        setWeatherData({ temp: 31.4, humidity: 68, desc: 'partly cloudy' });
+        setWeatherData({ temp: 31.4, humidity: 68, desc: 'Partly Cloudy' });
       });
   }, []);
 
@@ -36,7 +39,7 @@ export default function HotspotsPage() {
             {weatherData && (
               <>
                 <span>|</span>
-                <span className="text-ink font-bold">WEATHER: {weatherData.temp}°C, {weatherData.desc.toUpperCase()} ({weatherData.humidity}% HUM)</span>
+                <span className="text-ink font-bold">WEATHER: {weatherData.temp}°C, {(weatherData.desc || 'PARTLY CLOUDY').toUpperCase()} ({weatherData.humidity}% HUM)</span>
               </>
             )}
           </div>
