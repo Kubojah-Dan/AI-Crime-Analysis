@@ -16,3 +16,6 @@ pnpm-debug.log*
 
 # Catalyst CLI temp
 .catalyst/
+
+# TypeScript build info cache
+*.tsbuildinfo
