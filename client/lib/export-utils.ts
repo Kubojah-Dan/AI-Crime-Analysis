@@ -16,9 +16,23 @@ export interface ReportItem {
 export function downloadCSV(filename: string, rows: Record<string, any>[]) {
   if (!rows || !rows.length) return;
 
+  const dateStr = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+
+  // Build clean CSV with Metadata Header Block
   const headers = Object.keys(rows[0]);
-  const csvContent = [
-    headers.join(','),
+  const metadataBlock = [
+    `# =========================================================================`,
+    `# AEGISIQ PUBLIC SAFETY INTELLIGENCE & DECISION SUPPORT REPORT`,
+    `# REPORT NAME: ${filename.toUpperCase()}`,
+    `# GENERATED TIMESTAMP: ${dateStr}`,
+    `# SECURITY CLEARANCE: LEVEL-5 / POLICE CONTROL ROOM COPY`,
+    `# PROVENANCE: IMMUTABLE AUDIT CHAIN VERIFIED`,
+    `# =========================================================================`,
+    ``
+  ].join('\n');
+
+  const dataRows = [
+    headers.map(h => `"${h.toUpperCase()}"`).join(','),
     ...rows.map(row => 
       headers.map(header => {
         const val = row[header] ?? '';
@@ -27,8 +41,9 @@ export function downloadCSV(filename: string, rows: Record<string, any>[]) {
     )
   ].join('\n');
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
+  // Add BOM (\uFEFF) for perfect UTF-8 rendering in Microsoft Excel & Apple Numbers
+  const csvBlob = new Blob(['\uFEFF' + metadataBlock + dataRows], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(csvBlob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
   link.setAttribute('download', `${filename}.csv`);

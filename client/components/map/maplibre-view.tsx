@@ -19,12 +19,24 @@ const INDIAN_REGIONS = [
   { name: 'Hyderabad Cyberabad', lng: 78.4867, lat: 17.3850, zoom: 11, risk: '52% RISK' },
 ];
 
-const INDIAN_HOTSPOTS = [
-  { id: 'DL-01', title: 'Connaught Place Sector', lat: 28.6315, lng: 77.2167, risk: 88, status: 'CRITICAL' },
-  { id: 'MH-02', title: 'Marine Drive / Twin Peaks', lat: 18.9440, lng: 72.8230, risk: 74, status: 'VERIFIED' },
-  { id: 'KA-03', title: 'Bangalore MG Road / Indiranagar', lat: 12.9750, lng: 77.6080, risk: 65, status: 'LIVE' },
-  { id: 'TN-04', title: 'Chennai Harbour Zone', lat: 13.0827, lng: 80.2707, risk: 58, status: 'PERIODIC' },
-  { id: 'TS-05', title: 'Hyderabad Cyberabad', lat: 17.3850, lng: 78.4867, risk: 52, status: 'LIVE' },
+/* ── 4 Distinct Map Marker Categories ─────────────────────────────────── */
+const MAP_MARKERS = [
+  // 1. Hotspots (Risk Score) - Amber/Rust Concentric Circles
+  { type: 'HOTSPOT', id: 'HS-01', title: 'Connaught Place Risk Ring', lat: 28.6315, lng: 77.2167, label: '88% RISK', color: '#A63B2A' },
+  { type: 'HOTSPOT', id: 'HS-02', title: 'Hazratganj Central Ring', lat: 26.8467, lng: 80.9462, label: '82% RISK', color: '#A63B2A' },
+  { type: 'HOTSPOT', id: 'HS-03', title: 'Marine Drive Promenade', lat: 18.9440, lng: 72.8230, label: '74% RISK', color: '#C1852B' },
+
+  // 2. Units (Patrol / PCR) - Cyan Pulsing Markers
+  { type: 'UNIT', id: 'UP-32-PCR-124', title: 'PCR Van Unit 124', lat: 26.8480, lng: 80.9490, label: 'UP-32-PCR-124 (En Route)', color: '#06B6D4' },
+  { type: 'UNIT', id: 'DL-01-PCR-99', title: 'Delhi Patrol Unit 99', lat: 28.6330, lng: 77.2190, label: 'DL-01-PCR-99 (Patrolling)', color: '#06B6D4' },
+
+  // 3. Police Stations - Blue Station Icon Markers
+  { type: 'STATION', id: 'PS-CP', title: 'Central Police Station', lat: 28.6290, lng: 77.2130, label: 'CP Police Station', color: '#2563EB' },
+  { type: 'STATION', id: 'PS-HZ', title: 'Hazratganj Police Station', lat: 26.8440, lng: 80.9430, label: 'Hazratganj Station Limits', color: '#2563EB' },
+
+  // 4. Incident Clusters - Red Incident Cluster Pins
+  { type: 'CLUSTER', id: 'CLR-441', title: 'Cluster #AQ-CLR-441', lat: 28.6300, lng: 77.2200, label: 'Cluster #441 (4 Incidents)', color: '#DC2626' },
+  { type: 'CLUSTER', id: 'CLR-890', title: 'Cluster #AQ-CLR-890', lat: 12.9750, lng: 77.6080, label: 'Cluster #890 (2 Incidents)', color: '#DC2626' },
 ];
 
 export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSectorToolbar = false }: MapProps) {
@@ -48,27 +60,45 @@ export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSector
     map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
 
     map.on('load', () => {
-      INDIAN_HOTSPOTS.forEach((spot) => {
+      MAP_MARKERS.forEach((item) => {
         const el = document.createElement('div');
-        el.className = 'maplibre-hotspot-pin';
-        el.style.width = '24px';
-        el.style.height = '24px';
-        el.style.borderRadius = '50%';
-        el.style.backgroundColor = spot.risk > 70 ? 'rgba(166, 59, 42, 0.90)' : 'rgba(43, 90, 160, 0.90)';
-        el.style.border = '2px solid #F1EFE7';
-        el.style.boxShadow = '0 0 12px rgba(0,0,0,0.3)';
+        el.className = 'maplibre-marker';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.borderRadius = item.type === 'HOTSPOT' ? '50%' : '4px';
+        el.style.backgroundColor = item.color;
+        el.style.color = '#FFFFFF';
+        el.style.fontSize = '9px';
+        el.style.fontWeight = 'bold';
+        el.style.fontFamily = 'monospace';
+        el.style.padding = item.type === 'HOTSPOT' ? '0' : '2px 6px';
+        el.style.width = item.type === 'HOTSPOT' ? '28px' : 'auto';
+        el.style.height = item.type === 'HOTSPOT' ? '28px' : 'auto';
+        el.style.border = '2px solid #FFFFFF';
+        el.style.boxShadow = '0 0 10px rgba(0,0,0,0.4)';
         el.style.cursor = 'pointer';
+
+        if (item.type === 'HOTSPOT') {
+          el.innerText = '⚡';
+        } else if (item.type === 'UNIT') {
+          el.innerText = '🚔 ' + item.id;
+        } else if (item.type === 'STATION') {
+          el.innerText = '🏛️ ' + item.id;
+        } else {
+          el.innerText = '🔴 ' + item.id;
+        }
 
         const popupContent = `
           <div style="font-family: 'IBM Plex Sans', sans-serif; padding: 6px; color: #202A33;">
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: bold; color: #5B6570;">
-              ID: ${spot.id} | ${spot.status}
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: bold; color: ${item.color}; uppercase;">
+              ${item.type}: ${item.id}
             </div>
-            <div style="font-family: 'Fraunces', serif; font-size: 14px; font-weight: bold; margin-top: 2px;">
-              ${spot.title}
+            <div style="font-family: 'Fraunces', serif; font-size: 13px; font-weight: bold; margin-top: 2px;">
+              ${item.title}
             </div>
-            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; margin-top: 4px; font-weight: bold; color: ${spot.risk > 70 ? '#A63B2A' : '#2B5AA0'};">
-              RISK RATING: ${spot.risk}%
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: bold; margin-top: 4px; color: #202A33;">
+              ${item.label}
             </div>
           </div>
         `;
@@ -76,7 +106,7 @@ export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSector
         const popup = new maplibregl.Popup({ offset: 12 }).setHTML(popupContent);
 
         new maplibregl.Marker(el)
-          .setLngLat([spot.lng, spot.lat])
+          .setLngLat([item.lng, item.lat])
           .setPopup(popup)
           .addTo(map);
       });
