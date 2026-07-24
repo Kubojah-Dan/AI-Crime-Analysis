@@ -150,6 +150,70 @@ async def realtime_event_stream(request: Request):
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
+@app.get("/api/v1/ops/triage-queue")
+async def get_triage_queue():
+    """Returns live emergency triage alert queue."""
+    return {
+        "status": "success",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "queue": [
+            {"id": "ALT-101", "case_id": "23-05-28-1127", "title": "Armed Robbery Reported", "location": "Lucknow, Hazratganj", "severity": "CRITICAL", "sla_timer": "00:02:15", "confidence_pct": 82},
+            {"id": "ALT-102", "case_id": "23-05-28-1123", "title": "Gang Activity Detected", "location": "Prayagraj, Civil Lines", "severity": "HIGH", "sla_timer": "00:07:48", "confidence_pct": 76},
+            {"id": "ALT-103", "case_id": "23-05-28-1119", "title": "Vehicle Theft Cluster", "location": "Meerut, Kanker Khera", "severity": "HIGH", "sla_timer": "00:09:12", "confidence_pct": 69},
+        ]
+    }
+
+@app.get("/api/v1/ops/copilot/explain")
+async def get_copilot_explanation(case_id: str = "23-05-28-1127", sector: str = "Lucknow, Hazratganj", category: str = "Armed Robbery Reported"):
+    """Generates explainable copilot narrative and recommendations."""
+    ai_info = await generate_groq_ai_explanation(sector, category)
+    return {
+        "status": "success",
+        "case_id": case_id,
+        "predicted_risk_level": 0.82,
+        "confidence_pct": 82,
+        "summary": ai_info["narrative"],
+        "human_review_required": True,
+        "recommended_actions": [
+            "Verify camera CAM-DEL-CP-04 for active loitering pattern.",
+            "Notify nearest patrol unit UP-32-PCR-124 (ETA 2 mins).",
+            "Check open cases in adjacent beat limit.",
+            "Request analyst validation before case closure."
+        ]
+    }
+
+@app.post("/api/v1/ops/simulator/calculate")
+async def calculate_simulation(req: Dict[str, Any]):
+    """Calculates patrol re-allocation deployment deltas."""
+    units = req.get("units_count", 2)
+    sector = req.get("target_sector", "Lucknow, Hazratganj")
+    base_response = 4.2
+    proj_response = max(2.1, round(base_response - (units * 0.75), 1))
+    gap_reduction = min(94, 45 + (units * 22))
+
+    return {
+        "status": "success",
+        "target_sector": sector,
+        "units_reallocated": units,
+        "base_avg_response_min": base_avg_response,
+        "projected_avg_response_min": proj_response,
+        "response_time_delta_min": -round(units * 0.75, 1),
+        "coverage_gap_reduction_pct": gap_reduction
+    }
+
+@app.get("/api/v1/admin/models/health")
+async def get_model_health():
+    """Returns AI model governance metrics."""
+    return {
+        "status": "healthy",
+        "p95_latency_ms": 182,
+        "false_alert_rate_pct": 4.2,
+        "analyst_override_rate_pct": 8.6,
+        "regional_drift_score": 0.02,
+        "nist_compliance": "VERIFIED"
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

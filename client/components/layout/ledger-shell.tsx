@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   Radio, AlertTriangle, FileText, Layers, Plus, 
   Archive, HelpCircle, RefreshCw, Settings, ShieldCheck, 
-  User, CheckCircle2, SlidersHorizontal, Activity, LogOut, Sun, Moon, BarChart3, X, Bell, Database, Cpu 
+  User, CheckCircle2, SlidersHorizontal, Activity, LogOut, Sun, Moon, BarChart3, X, Bell, Database, Cpu, ShieldAlert, Zap, Search, MapPin 
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { useTheme } from '@/context/theme-context';
@@ -62,7 +62,10 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
   };
 
   const navItems = [
-    { href: '/hotspots', label: 'Hotspots', icon: Radio },
+    { href: '/ops', label: 'Command Fusion', icon: Radio },
+    { href: '/ops/queue', label: 'Triage Queue', icon: ShieldAlert },
+    { href: '/ops/simulator', label: 'Simulator', icon: Zap },
+    { href: '/hotspots', label: 'Hotspots', icon: MapPin },
     { href: '/incidents', label: 'Incidents', icon: AlertTriangle },
     { href: '/cases', label: 'Cases', icon: Layers },
     { href: '/reports', label: 'Reports', icon: FileText },
@@ -70,10 +73,11 @@ export function LedgerShell({ children }: { children: React.ReactNode }) {
   ];
 
   const bottomNavItems = [
-    { href: '/networks', label: 'Ingest Networks', icon: Activity },
+    { href: '/search', label: 'Global Search', icon: Search },
+    { href: '/admin/models', label: 'AI Model Health', icon: Cpu },
+    { href: '/admin/data-quality', label: 'Ingest Quality', icon: Database },
     { href: '/admin/fairness', label: 'Ethics & Bias', icon: ShieldCheck },
-    { href: '/archive', label: 'Archive', icon: Archive },
-    { href: '/support', label: 'Support', icon: HelpCircle },
+    { href: '/networks', label: 'Ingest Networks', icon: Activity },
   ];
 
   if (!isInitialized || !isAuthenticated) {
