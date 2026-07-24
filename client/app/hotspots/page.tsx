@@ -47,6 +47,11 @@ export default function HotspotsPage() {
       });
   }, [selectedCity]);
 
+  const handleSelectCityByName = (cityName: string) => {
+    const city = INDIAN_CITIES.find(c => c.query.toLowerCase() === cityName.toLowerCase() || c.name.toLowerCase() === cityName.toLowerCase()) || INDIAN_CITIES[0];
+    setSelectedCity(city);
+  };
+
   return (
     <LedgerShell>
       <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-paper selection:bg-cobalt selection:text-white">
@@ -62,10 +67,7 @@ export default function HotspotsPage() {
               <Navigation size={12} className="text-cobalt" />
               <select 
                 value={selectedCity.name}
-                onChange={(e) => {
-                  const city = INDIAN_CITIES.find(c => c.name === e.target.value) || INDIAN_CITIES[0];
-                  setSelectedCity(city);
-                }}
+                onChange={(e) => handleSelectCityByName(e.target.value)}
                 className="bg-paper border border-hairline rounded px-2.5 py-1 text-xs font-bold text-ink outline-none cursor-pointer hover:border-cobalt transition-colors"
               >
                 {INDIAN_CITIES.map(c => (
@@ -96,9 +98,14 @@ export default function HotspotsPage() {
         {/* Map & Insight Panel Body */}
         <div className="flex-1 flex overflow-hidden relative">
           
-          {/* Main Map View Container with Dynamic MapLibre Map Center */}
+          {/* Main Map View Container with 2-Way Region Sync */}
           <div className="flex-1 relative bg-[#E2DFD5] border-r border-hairline overflow-hidden">
-            <MapLibreView center={[selectedCity.lng, selectedCity.lat]} zoom={11} showSectorToolbar={true} />
+            <MapLibreView 
+              center={[selectedCity.lng, selectedCity.lat]} 
+              zoom={11} 
+              showSectorToolbar={true}
+              onRegionChange={(cityName) => handleSelectCityByName(cityName)}
+            />
 
             {/* Corner Registration Crosshairs */}
             <div className="absolute top-4 left-4 font-mono text-xs text-hairline pointer-events-none z-10">+</div>

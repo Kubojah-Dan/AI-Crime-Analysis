@@ -9,14 +9,15 @@ interface MapProps {
   center?: [number, number]; // [lng, lat]
   zoom?: number;
   showSectorToolbar?: boolean;
+  onRegionChange?: (cityName: string) => void;
 }
 
 const INDIAN_REGIONS = [
-  { name: 'Delhi NCR', lng: 77.2090, lat: 28.6139, zoom: 11, risk: '88% RISK' },
-  { name: 'Mumbai South', lng: 72.8230, lat: 18.9440, zoom: 11, risk: '74% RISK' },
-  { name: 'Bangalore Tech Corridor', lng: 77.6080, lat: 12.9750, zoom: 11, risk: '65% RISK' },
-  { name: 'Chennai Harbour', lng: 80.2707, lat: 13.0827, zoom: 11, risk: '58% RISK' },
-  { name: 'Hyderabad Cyberabad', lng: 78.4867, lat: 17.3850, zoom: 11, risk: '52% RISK' },
+  { name: 'Delhi NCR', query: 'Delhi', lng: 77.2090, lat: 28.6139, zoom: 11, risk: '88% RISK' },
+  { name: 'Mumbai South', query: 'Mumbai', lng: 72.8230, lat: 18.9440, zoom: 11, risk: '74% RISK' },
+  { name: 'Bangalore Tech Corridor', query: 'Bangalore', lng: 77.6080, lat: 12.9750, zoom: 11, risk: '65% RISK' },
+  { name: 'Chennai Harbour', query: 'Chennai', lng: 80.2707, lat: 13.0827, zoom: 11, risk: '58% RISK' },
+  { name: 'Hyderabad Cyberabad', query: 'Hyderabad', lng: 78.4867, lat: 17.3850, zoom: 11, risk: '52% RISK' },
 ];
 
 /* ── 4 Distinct Map Marker Categories ─────────────────────────────────── */
@@ -39,7 +40,7 @@ const MAP_MARKERS = [
   { type: 'CLUSTER', id: 'CLR-890', title: 'Cluster #AQ-CLR-890', lat: 12.9750, lng: 77.6080, label: 'Cluster #890 (2 Incidents)', color: '#DC2626' },
 ];
 
-export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSectorToolbar = false }: MapProps) {
+export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSectorToolbar = false, onRegionChange }: MapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [activeRegion, setActiveRegion] = useState<string>('Delhi NCR');
@@ -122,6 +123,19 @@ export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSector
     };
   }, []); // Run ONCE on mount
 
+  // Fly to center when center prop updates externally
+  useEffect(() => {
+    if (mapRef.current && center) {
+      mapRef.current.flyTo({
+        center: center,
+        zoom: zoom,
+        speed: 1.2,
+        curve: 1.4,
+        essential: true,
+      });
+    }
+  }, [center, zoom]);
+
   const handleFlyToRegion = (reg: typeof INDIAN_REGIONS[0]) => {
     setActiveRegion(reg.name);
     if (mapRef.current) {
@@ -132,6 +146,9 @@ export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSector
         curve: 1.4,
         essential: true,
       });
+    }
+    if (onRegionChange) {
+      onRegionChange(reg.query);
     }
   };
 
