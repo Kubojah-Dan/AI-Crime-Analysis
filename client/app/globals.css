@@ -39,6 +39,8 @@ body {
   background-color: var(--paper-raised);
   border: 1px solid var(--hairline);
   position: relative;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

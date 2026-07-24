@@ -3,11 +3,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { MapPin, Navigation } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 interface MapProps {
   center?: [number, number]; // [lng, lat]
   zoom?: number;
+  showSectorToolbar?: boolean;
 }
 
 const INDIAN_REGIONS = [
@@ -26,7 +27,7 @@ const INDIAN_HOTSPOTS = [
   { id: 'TS-05', title: 'Hyderabad Cyberabad', lat: 17.3850, lng: 78.4867, risk: 52, status: 'LIVE' },
 ];
 
-export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6 }: MapProps) {
+export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6, showSectorToolbar = false }: MapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [activeRegion, setActiveRegion] = useState<string>('Delhi NCR');
@@ -109,26 +110,28 @@ export function MapLibreView({ center = [77.2090, 28.6139], zoom = 6 }: MapProps
       {/* Map Container */}
       <div ref={mapContainerRef} className="w-full h-full rounded" />
 
-      {/* Floating Interactive Indian City Switcher Toolbar */}
-      <div className="absolute top-3 left-3 z-10 bg-paper-raised/95 backdrop-blur border border-hairline p-2 rounded shadow-md flex flex-wrap items-center gap-1.5 font-mono text-xs max-w-xl">
-        <div className="flex items-center gap-1 text-[10px] font-bold text-cobalt px-2 uppercase">
-          <Navigation size={12} className="animate-spin-slow" />
-          <span>INDIAN SECTORS:</span>
+      {/* Optional Floating Interactive Indian City Switcher Toolbar */}
+      {showSectorToolbar && (
+        <div className="absolute bottom-3 left-3 z-10 bg-paper-raised/95 backdrop-blur border border-hairline p-2 rounded shadow-md flex flex-wrap items-center gap-1.5 font-mono text-xs max-w-xl">
+          <div className="flex items-center gap-1 text-[10px] font-bold text-cobalt px-2 uppercase">
+            <Navigation size={12} className="animate-spin-slow" />
+            <span>INDIAN SECTORS:</span>
+          </div>
+          {INDIAN_REGIONS.map((reg) => (
+            <button
+              key={reg.name}
+              onClick={() => handleFlyToRegion(reg)}
+              className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all duration-200 ${
+                activeRegion === reg.name
+                  ? 'bg-cobalt text-white shadow-sm'
+                  : 'bg-paper text-ink-soft hover:text-ink hover:bg-paper-raised border border-hairline'
+              }`}
+            >
+              {reg.name}
+            </button>
+          ))}
         </div>
-        {INDIAN_REGIONS.map((reg) => (
-          <button
-            key={reg.name}
-            onClick={() => handleFlyToRegion(reg)}
-            className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all duration-200 ${
-              activeRegion === reg.name
-                ? 'bg-cobalt text-white shadow-sm'
-                : 'bg-paper text-ink-soft hover:text-ink hover:bg-paper-raised border border-hairline'
-            }`}
-          >
-            {reg.name}
-          </button>
-        ))}
-      </div>
+      )}
     </div>
   );
 }

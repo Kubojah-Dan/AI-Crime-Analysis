@@ -54,7 +54,7 @@ export default function HotspotsPage() {
           
           {/* Main Map View Container with Real MapLibre Map */}
           <div className="flex-1 relative bg-[#E2DFD5] border-r border-hairline overflow-hidden">
-            <MapLibreView center={[77.2090, 28.6139]} zoom={5} />
+            <MapLibreView center={[77.2090, 28.6139]} zoom={5} showSectorToolbar={true} />
 
             {/* Corner Registration Crosshairs */}
             <div className="absolute top-4 left-4 font-mono text-xs text-hairline pointer-events-none z-10">+</div>

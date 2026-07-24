@@ -19,7 +19,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-paper text-ink font-sans flex flex-col selection:bg-cobalt selection:text-white relative overflow-hidden transition-colors duration-300">
       
       {/* Animated Cybersecurity HUD Background */}
-      <CyberBackground />
+      <CyberBackground variant="hero" />
 
       {/* ── Header ───────────────────────────────────────────────────── */}
       <header className="h-16 px-6 md:px-12 border-b border-hairline bg-paper-raised/95 backdrop-blur flex items-center justify-between z-30 shadow-sm transition-all duration-300">
